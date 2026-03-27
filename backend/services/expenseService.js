@@ -7,8 +7,8 @@ const createManualExpense = async (groupId, paidById, { title, totalAmount }) =>
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const scanReceiptAndCreateExpense = async (groupId, paidById, file) => {
-    if (!file) throw new Error("Fiş görseli bulunamadı.");
+const scanReceiptAndCreateExpense = async (groupId, paidById, bodyData) => {
+    if (!bodyData || !bodyData.imageBase64) throw new Error("Fiş görseli bulunamadı.");
     if (!process.env.GEMINI_API_KEY) throw new Error("Sunucuda GEMINI_API_KEY tanımlı değil.");
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -16,8 +16,8 @@ const scanReceiptAndCreateExpense = async (groupId, paidById, file) => {
 
     const imageParts = [{
         inlineData: {
-            data: file.buffer.toString("base64"),
-            mimeType: file.mimetype
+            data: bodyData.imageBase64,
+            mimeType: bodyData.mimeType || "image/jpeg"
         }
     }];
 

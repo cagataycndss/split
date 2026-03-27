@@ -24,17 +24,23 @@ const ExpenseForm = ({ groupId, onExpenseAdded }) => {
   const handleAiScan = async () => {
     if (!file) return alert("Lütfen fiş görseli seçin.");
     setLoading(true);
-    const formData = new FormData();
-    formData.append('receiptImage', file);
-    try {
-      const res = await expenseAPI.scanAI(groupId, formData);
-      onExpenseAdded(res.data);
-      setFile(null);
-    } catch(err) {
-      alert("AI okumada hata oluştu.");
-    } finally {
-      setLoading(false);
-    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result.split(',')[1];
+      const mimeType = file.type;
+      
+      try {
+        const res = await expenseAPI.scanAI(groupId, { imageBase64: base64String, mimeType });
+        onExpenseAdded(res.data);
+        setFile(null);
+      } catch(err) {
+        alert(err.response?.data?.message || "AI okumada hata oluştu.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (

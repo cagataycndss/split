@@ -13,7 +13,7 @@ export const groupAPI = {
 
 export const expenseAPI = {
   createManual: (groupId, data) => api.post(`/groups/${groupId}/expenses`, data),
-  scanAI: (groupId, data) => api.post(`/groups/${groupId}/expenses/scan`, data, { headers: { 'Content-Type': 'multipart/form-data' }}),
+  scanAI: (groupId, data) => api.post(`/groups/${groupId}/expenses/scan`, data),
   getDetails: (expenseId) => api.get(`/expenses/${expenseId}`),
   calculateDebts: (expenseId) => api.get(`/expenses/${expenseId}/calculate`),
   splitItem: (expenseId, itemId, data) => api.post(`/expenses/${expenseId}/items/${itemId}/split`, data),

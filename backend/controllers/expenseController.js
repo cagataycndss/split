@@ -5,7 +5,10 @@ const createManualExpense = async (req, res) => {
     catch (e) { res.status(401).json({ message: e.message }); }
 };
 const scanReceiptAndCreateExpense = async (req, res) => {
-    try { const exp = await expenseService.scanReceiptAndCreateExpense(req.params.groupId, req.user.id, req.file); res.status(201).json(exp); }
+    try { 
+      const exp = await expenseService.scanReceiptAndCreateExpense(req.params.groupId, req.user.id, req.body); 
+      res.status(201).json(exp); 
+    }
     catch (e) { res.status(401).json({ message: e.message }); }
 };
 const getExpenseDetails = async (req, res) => {
