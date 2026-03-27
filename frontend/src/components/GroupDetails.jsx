@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ExpenseForm from './ExpenseForm';
 import DebtTable from './DebtTable';
 
 const GroupDetails = ({ groupId, groupName }) => {
+  const [expenses, setExpenses] = useState([]);
+
+  const handleExpenseAdded = (newExpense) => {
+    setExpenses([newExpense, ...expenses]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -19,14 +25,14 @@ const GroupDetails = ({ groupId, groupName }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Sol Kolon - Gider Ekleme Formu */}
           <div className="lg:col-span-5">
-            <ExpenseForm groupId={groupId} onExpenseAdded={() => console.log('Harcama eklendi')} />
+            <ExpenseForm groupId={groupId} onExpenseAdded={handleExpenseAdded} />
           </div>
 
           {/* Sağ Kolon - Ortak Borç Durumu */}
           <div className="lg:col-span-7">
              <div className="bg-white shadow-sm rounded-xl p-6 h-full">
                <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">Hesap Özeti</h2>
-               <DebtTable expenseId="demo-expense-id" />
+               <DebtTable expenses={expenses} />
              </div>
           </div>
         </div>

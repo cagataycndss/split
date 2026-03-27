@@ -11,8 +11,8 @@ const ExpenseForm = ({ groupId, onExpenseAdded }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await expenseAPI.createManual(groupId, { title, totalAmount: Number(amount) });
-      onExpenseAdded();
+      const res = await expenseAPI.createManual(groupId, { title, totalAmount: Number(amount) });
+      onExpenseAdded(res.data);
       setTitle(''); setAmount('');
     } catch (err) {
       alert("Harcama eklenirken hata oluştu.");
@@ -27,8 +27,8 @@ const ExpenseForm = ({ groupId, onExpenseAdded }) => {
     const formData = new FormData();
     formData.append('receiptImage', file);
     try {
-      await expenseAPI.scanAI(groupId, formData);
-      onExpenseAdded();
+      const res = await expenseAPI.scanAI(groupId, formData);
+      onExpenseAdded(res.data);
       setFile(null);
     } catch(err) {
       alert("AI okumada hata oluştu.");
