@@ -13,8 +13,11 @@ router.get('/:groupId/members', groupController.getGroupMembers);
 router.post('/:groupId/members', groupController.addGroupMember);
 router.delete('/:groupId/members/:userId', groupController.removeGroupMember);
 
-// Expense creation paths are mapped under groups in YAML
+// Gider rotaları ve Multer (Dosya Yükleme) yapılandırması
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
 router.post('/:groupId/expenses', expenseController.createManualExpense);
-router.post('/:groupId/expenses/scan', expenseController.scanReceiptAndCreateExpense);
+router.post('/:groupId/expenses/scan', upload.single('receiptImage'), expenseController.scanReceiptAndCreateExpense);
 
 module.exports = router;

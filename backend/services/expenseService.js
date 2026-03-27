@@ -5,10 +5,46 @@ const createManualExpense = async (groupId, paidById, { title, totalAmount }) =>
     return expense.save();
 };
 
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 const scanReceiptAndCreateExpense = async (groupId, paidById, file) => {
+    if (!file) throw new Error("Fiş görseli bulunamadı.");
+    if (!process.env.GEMINI_API_KEY) throw new Error("Sunucuda GEMINI_API_KEY tanımlı değil.");
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const imageParts = [{
+        inlineData: {
+            data: file.buffer.toString("base64"),
+            mimeType: file.mimetype
+        }
+    }];
+
+    const prompt = `Bu bir alışveriş fişidir. Verileri analiz et ve SADECE aşağıdaki formatta bir JSON objesi döndür. Asla markdown kodu kullanma.
+{
+  "title": "Mağaza/Market Adı",
+  "totalAmount": 150.50,
+  "items": [
+    { "name": "Ürün 1", "category": "Gıda", "price": 50.25 }
+  ]
+}`;
+
+    let parsedData;
+    try {
+        const result = await model.generateContent([prompt, ...imageParts]);
+        const responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+        parsedData = JSON.parse(responseText);
+    } catch (e) {
+        console.error("Gemini okuma hatası:", e);
+        throw new Error("Fiş okunamadı veya bulanık.");
+    }
+
     const expense = new Expense({
-        groupId, paidById, title: "AI Scan Sonucu Fiş", totalAmount: 150,
-        items: [{ name: "Market Ürünü", category: "Gıda", price: 150 }]
+        groupId, paidById, 
+        title: parsedData.title || "Yapay Zeka Okuması", 
+        totalAmount: parsedData.totalAmount || 0,
+        items: parsedData.items || []
     });
     return expense.save();
 };
